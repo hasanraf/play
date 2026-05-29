@@ -4,269 +4,184 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>StreamFlix IPTV</title>
+<title>Live TV</title>
 
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
 
 *{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:Poppins,sans-serif;
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Inter',sans-serif;
 }
 
 body{
-    background:#0a0a0a;
-    color:white;
+background:#0f172a;
+color:white;
 }
 
-header{
-    position:fixed;
-    top:0;
-    left:0;
-    width:100%;
-    z-index:1000;
-    background:rgba(0,0,0,.8);
-    backdrop-filter:blur(20px);
-    padding:15px 25px;
+.header{
+padding:20px;
+font-size:24px;
+font-weight:700;
+text-align:center;
+background:#111827;
+position:sticky;
+top:0;
+z-index:100;
 }
 
-.logo{
-    color:#e50914;
-    font-size:30px;
-    font-weight:700;
+.search-box{
+padding:15px;
 }
 
-.hero{
-    height:60vh;
-    background:
-    linear-gradient(to top,#0a0a0a,transparent),
-    url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=1600');
-    background-size:cover;
-    background-position:center;
-    display:flex;
-    align-items:flex-end;
-    padding:40px;
+.search-box input{
+width:100%;
+padding:14px 16px;
+border:none;
+border-radius:14px;
+background:#1e293b;
+color:white;
+font-size:15px;
 }
 
-.hero h1{
-    font-size:3rem;
+.tabs{
+display:flex;
+gap:10px;
+padding:0 15px 15px;
+overflow:auto;
 }
 
-.container{
-    padding:25px;
+.tab{
+padding:10px 18px;
+background:#1e293b;
+border-radius:999px;
+cursor:pointer;
+white-space:nowrap;
+font-size:14px;
 }
 
-.search{
-    width:100%;
-    padding:15px;
-    border:none;
-    outline:none;
-    border-radius:12px;
-    background:#181818;
-    color:white;
-    margin-bottom:25px;
+.tab.active{
+background:#2563eb;
 }
 
 .grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
-    gap:20px;
+padding:15px;
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(170px,1fr));
+gap:15px;
 }
 
 .card{
-    background:#181818;
-    border-radius:16px;
-    overflow:hidden;
-    cursor:pointer;
-    transition:.3s;
+background:#1e293b;
+border-radius:18px;
+overflow:hidden;
+cursor:pointer;
+transition:.3s;
+position:relative;
 }
 
 .card:hover{
-    transform:scale(1.05);
+transform:translateY(-4px);
 }
 
-.poster{
-    height:220px;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    font-size:70px;
-    background:linear-gradient(135deg,#e50914,#ff4d4d);
+.thumb{
+height:110px;
+width:100%;
+object-fit:cover;
+}
+
+.live{
+position:absolute;
+top:10px;
+right:10px;
+background:red;
+padding:4px 10px;
+border-radius:20px;
+font-size:11px;
+font-weight:bold;
 }
 
 .info{
-    padding:15px;
+padding:12px;
 }
 
-.info h3{
-    font-size:18px;
+.name{
+font-size:15px;
+font-weight:600;
 }
 
-/* FULLSCREEN PLAYER */
-
-.player-overlay{
-    position:fixed;
-    inset:0;
-    background:black;
-    z-index:999999;
-    display:none;
+.category{
+font-size:12px;
+opacity:.7;
+margin-top:4px;
 }
 
-.player-overlay.active{
-    display:block;
+/* Player */
+
+.player{
+position:fixed;
+inset:0;
+background:black;
+display:none;
+z-index:99999;
 }
 
-#video{
-    width:100%;
-    height:100%;
-    object-fit:contain;
-    background:black;
+.player video{
+width:100%;
+height:100%;
+object-fit:contain;
+background:black;
 }
 
-.close-player{
-    position:absolute;
-    top:20px;
-    right:20px;
-    z-index:9999999;
-    width:50px;
-    height:50px;
-    border:none;
-    border-radius:50%;
-    background:#e50914;
-    color:white;
-    font-size:20px;
-    cursor:pointer;
-}
-
-.channel-list{
-    position:absolute;
-    left:0;
-    top:0;
-    width:320px;
-    height:100%;
-    overflow:auto;
-    background:rgba(0,0,0,.75);
-    backdrop-filter:blur(20px);
-    padding:80px 15px 15px;
-}
-
-.channel{
-    padding:12px;
-    background:#181818;
-    border-radius:10px;
-    margin-bottom:10px;
-    cursor:pointer;
-}
-
-.channel:hover{
-    background:#e50914;
-}
-
-@media(max-width:768px){
-
-.hero{
-    height:40vh;
-}
-
-.hero h1{
-    font-size:2rem;
-}
-
-.channel-list{
-    width:240px;
-}
-
+.close{
+position:absolute;
+top:20px;
+right:20px;
+width:45px;
+height:45px;
+border:none;
+border-radius:50%;
+background:#ef4444;
+color:white;
+font-size:20px;
+cursor:pointer;
+z-index:100000;
 }
 
 </style>
 </head>
 <body>
 
-<header>
-    <div class="logo">STREAMFLIX</div>
-</header>
+<div class="header">📺 Live TV</div>
 
-<section class="hero">
-    <h1>Unlimited IPTV Streaming</h1>
-</section>
-
-<div class="container">
-
+<div class="search-box">
 <input
 type="text"
-class="search"
-placeholder="Search Category...">
-
-<div class="grid">
-
-<div class="card" onclick="loadPlaylist('BDTV')">
-    <div class="poster">📺</div>
-    <div class="info">
-        <h3>BDTV</h3>
-    </div>
+id="search"
+placeholder="Search channels..."
+onkeyup="searchChannel()">
 </div>
 
-<div class="card" onclick="loadPlaylist('Sports')">
-    <div class="poster">⚽</div>
-    <div class="info">
-        <h3>Sports</h3>
-    </div>
+<div class="tabs">
+<div class="tab active" onclick="filterCategory('All',this)">All</div>
+<div class="tab" onclick="filterCategory('Sports',this)">Sports</div>
+<div class="tab" onclick="filterCategory('News',this)">News</div>
+<div class="tab" onclick="filterCategory('Movies',this)">Movies</div>
+<div class="tab" onclick="filterCategory('Kids',this)">Kids</div>
 </div>
 
-<div class="card" onclick="loadPlaylist('Movies')">
-    <div class="poster">🎬</div>
-    <div class="info">
-        <h3>Movies</h3>
-    </div>
-</div>
+<div class="grid" id="grid"></div>
 
-<div class="card" onclick="loadPlaylist('Entertainment')">
-    <div class="poster">🎭</div>
-    <div class="info">
-        <h3>Entertainment</h3>
-    </div>
-</div>
+<div class="player" id="player">
 
-<div class="card" onclick="loadPlaylist('Music')">
-    <div class="poster">🎵</div>
-    <div class="info">
-        <h3>Music</h3>
-    </div>
-</div>
-
-<div class="card" onclick="loadPlaylist('News')">
-    <div class="poster">📰</div>
-    <div class="info">
-        <h3>News</h3>
-    </div>
-</div>
-
-<div class="card" onclick="loadPlaylist('Kids')">
-    <div class="poster">🧸</div>
-    <div class="info">
-        <h3>Kids</h3>
-    </div>
-</div>
-
-</div>
-</div>
-
-<!-- FULL SCREEN PLAYER -->
-
-<div class="player-overlay" id="playerOverlay">
-
-<button class="close-player" onclick="closePlayer()">
+<button class="close" onclick="closePlayer()">
 ✕
 </button>
-
-<div class="channel-list" id="channelList">
-    <h3>Channels</h3>
-</div>
 
 <video
 id="video"
@@ -279,113 +194,160 @@ playsinline>
 
 <script>
 
-const playlists = {
-BDTV:'https://raw.githubusercontent.com/hasanraf/BDzone/refs/heads/main/BDTv.m3u.txt',
-Sports:'https://raw.githubusercontent.com/hasanraf/sports/refs/heads/main/sports.m3u',
-Entertainment:'https://raw.githubusercontent.com/hasanraf/entertainment/refs/heads/main/entertainment.m3u',
-Movies:'https://raw.githubusercontent.com/hasanraf/Movies/refs/heads/main/movie.m3u',
-Music:'https://raw.githubusercontent.com/hasanraf/musicandother/refs/heads/main/musicandother.m3u',
-News:'https://raw.githubusercontent.com/hasanraf/News/refs/heads/main/news.m3u',
-Kids:'https://raw.githubusercontent.com/hasanraf/Kids/refs/heads/main/kids.m3u'
-};
+const channels = [
 
-const video = document.getElementById('video');
+{
+name:"Sports TV",
+category:"Sports",
+image:"https://picsum.photos/400/220?1",
+url:"https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
+},
 
-async function loadPlaylist(category){
+{
+name:"News Live",
+category:"News",
+image:"https://picsum.photos/400/220?2",
+url:"https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
+},
 
-    document.getElementById('playerOverlay').classList.add('active');
+{
+name:"Movie Plus",
+category:"Movies",
+image:"https://picsum.photos/400/220?3",
+url:"https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
+},
 
-    const url = playlists[category];
-
-    try{
-
-        const res = await fetch(url);
-        const text = await res.text();
-
-        const lines = text.split('\n');
-
-        let channels = [];
-
-        for(let i=0;i<lines.length;i++){
-
-            if(lines[i].includes('#EXTINF')){
-
-                const name = lines[i].split(',').pop().trim();
-                const stream = lines[i+1]?.trim();
-
-                if(stream){
-                    channels.push({
-                        name,
-                        stream
-                    });
-                }
-            }
-        }
-
-        renderChannels(channels);
-
-        if(channels.length){
-            playChannel(channels[0].stream);
-        }
-
-    }catch(err){
-        alert('Playlist loading failed');
-        console.error(err);
-    }
+{
+name:"Kids World",
+category:"Kids",
+image:"https://picsum.photos/400/220?4",
+url:"https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
 }
 
-function renderChannels(channels){
+];
 
-    const box = document.getElementById('channelList');
+let current = [...channels];
 
-    box.innerHTML = '<h3>Channels</h3>';
+function render(data){
 
-    channels.forEach(ch=>{
+const grid = document.getElementById("grid");
 
-        const div = document.createElement('div');
+grid.innerHTML="";
 
-        div.className='channel';
+data.forEach(ch=>{
 
-        div.innerText=ch.name;
+grid.innerHTML += `
+<div class="card"
+onclick="playChannel('${ch.url}')">
 
-        div.onclick=()=>{
-            playChannel(ch.stream);
-        }
+<div class="live">LIVE</div>
 
-        box.appendChild(div);
-    });
+<img
+class="thumb"
+src="${ch.image}">
+
+<div class="info">
+
+<div class="name">
+${ch.name}
+</div>
+
+<div class="category">
+${ch.category}
+</div>
+
+</div>
+
+</div>
+`;
+
+});
+
+}
+
+render(channels);
+
+function searchChannel(){
+
+const keyword =
+document.getElementById("search")
+.value.toLowerCase();
+
+const filtered =
+current.filter(item =>
+item.name.toLowerCase().includes(keyword)
+);
+
+render(filtered);
+
+}
+
+function filterCategory(cat,el){
+
+document
+.querySelectorAll('.tab')
+.forEach(tab=>tab.classList.remove('active'));
+
+el.classList.add('active');
+
+if(cat==="All"){
+
+current=[...channels];
+
+}else{
+
+current=
+channels.filter(c=>c.category===cat);
+
+}
+
+render(current);
+
 }
 
 function playChannel(url){
 
-    if(Hls.isSupported()){
+const player =
+document.getElementById("player");
 
-        const hls = new Hls();
+const video =
+document.getElementById("video");
 
-        hls.loadSource(url);
+player.style.display="block";
 
-        hls.attachMedia(video);
+if(Hls.isSupported()){
 
-    }else{
+const hls = new Hls();
 
-        video.src=url;
-    }
+hls.loadSource(url);
 
-    video.play();
+hls.attachMedia(video);
 
-    if(document.documentElement.requestFullscreen){
-        document.documentElement.requestFullscreen();
-    }
+}else{
+
+video.src=url;
+
+}
+
+video.play();
+
+if(video.requestFullscreen){
+video.requestFullscreen();
+}
+
 }
 
 function closePlayer(){
 
-    video.pause();
+document.getElementById("player")
+.style.display="none";
 
-    video.src='';
+const video =
+document.getElementById("video");
 
-    document.getElementById('playerOverlay')
-    .classList.remove('active');
+video.pause();
+video.src="";
+
 }
 
 </script>
