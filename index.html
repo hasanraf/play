@@ -3,186 +3,186 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>StreamFlix IPTV</title>
+
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
+
 *{
     margin:0;
     padding:0;
     box-sizing:border-box;
-    font-family:'Poppins',sans-serif;
+    font-family:Poppins,sans-serif;
 }
 
 body{
-    background:#0b0b0f;
-    color:#fff;
-    min-height:100vh;
+    background:#0a0a0a;
+    color:white;
 }
 
-/* Hero */
-.hero{
-    height:55vh;
-    background:
-    linear-gradient(to top,#0b0b0f 10%,transparent 60%),
-    url('https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=1600') center/cover;
-    display:flex;
-    align-items:flex-end;
-    padding:40px;
-}
-
-.hero-content h1{
-    font-size:3rem;
-    font-weight:700;
-    color:#e50914;
-}
-
-.hero-content p{
-    max-width:600px;
-    margin-top:10px;
-    opacity:.8;
-}
-
-/* Header */
 header{
     position:fixed;
     top:0;
+    left:0;
     width:100%;
-    z-index:999;
+    z-index:1000;
+    background:rgba(0,0,0,.8);
     backdrop-filter:blur(20px);
-    background:rgba(0,0,0,.5);
     padding:15px 25px;
 }
 
 .logo{
     color:#e50914;
-    font-size:28px;
+    font-size:30px;
     font-weight:700;
 }
 
-/* Sections */
-.section{
-    padding:30px;
+.hero{
+    height:60vh;
+    background:
+    linear-gradient(to top,#0a0a0a,transparent),
+    url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=1600');
+    background-size:cover;
+    background-position:center;
+    display:flex;
+    align-items:flex-end;
+    padding:40px;
 }
 
-.section-title{
-    font-size:1.4rem;
-    margin-bottom:20px;
-    font-weight:600;
+.hero h1{
+    font-size:3rem;
 }
 
-.cards{
+.container{
+    padding:25px;
+}
+
+.search{
+    width:100%;
+    padding:15px;
+    border:none;
+    outline:none;
+    border-radius:12px;
+    background:#181818;
+    color:white;
+    margin-bottom:25px;
+}
+
+.grid{
     display:grid;
     grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
     gap:20px;
 }
 
 .card{
-    background:linear-gradient(145deg,#1a1a22,#0f0f14);
-    border-radius:18px;
+    background:#181818;
+    border-radius:16px;
     overflow:hidden;
     cursor:pointer;
-    transition:.35s;
-    border:1px solid rgba(255,255,255,.05);
+    transition:.3s;
 }
 
 .card:hover{
-    transform:translateY(-8px) scale(1.03);
-    box-shadow:0 15px 35px rgba(229,9,20,.25);
+    transform:scale(1.05);
 }
 
-.card-banner{
-    height:120px;
+.poster{
+    height:220px;
     display:flex;
-    align-items:center;
     justify-content:center;
-    font-size:42px;
+    align-items:center;
+    font-size:70px;
     background:linear-gradient(135deg,#e50914,#ff4d4d);
 }
 
-.card-body{
+.info{
     padding:15px;
 }
 
-.card-body h3{
+.info h3{
     font-size:18px;
 }
 
-.card-body p{
-    opacity:.7;
-    font-size:13px;
-    margin-top:6px;
-}
+/* FULLSCREEN PLAYER */
 
-/* Player Modal */
-.modal{
+.player-overlay{
     position:fixed;
     inset:0;
-    background:rgba(0,0,0,.9);
+    background:black;
+    z-index:999999;
     display:none;
-    justify-content:center;
-    align-items:center;
-    z-index:9999;
 }
 
-.modal-content{
-    width:95%;
-    max-width:900px;
-    background:#111;
-    border-radius:20px;
-    overflow:hidden;
+.player-overlay.active{
+    display:block;
 }
 
-.modal-header{
-    padding:15px 20px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    border-bottom:1px solid #222;
-}
-
-.close-btn{
-    background:#e50914;
-    border:none;
-    color:white;
-    width:40px;
-    height:40px;
-    border-radius:50%;
-    cursor:pointer;
-    font-size:18px;
-}
-
-iframe{
+#video{
     width:100%;
-    height:70vh;
+    height:100%;
+    object-fit:contain;
+    background:black;
+}
+
+.close-player{
+    position:absolute;
+    top:20px;
+    right:20px;
+    z-index:9999999;
+    width:50px;
+    height:50px;
     border:none;
+    border-radius:50%;
+    background:#e50914;
+    color:white;
+    font-size:20px;
+    cursor:pointer;
+}
+
+.channel-list{
+    position:absolute;
+    left:0;
+    top:0;
+    width:320px;
+    height:100%;
+    overflow:auto;
+    background:rgba(0,0,0,.75);
+    backdrop-filter:blur(20px);
+    padding:80px 15px 15px;
+}
+
+.channel{
+    padding:12px;
+    background:#181818;
+    border-radius:10px;
+    margin-bottom:10px;
+    cursor:pointer;
+}
+
+.channel:hover{
+    background:#e50914;
 }
 
 @media(max-width:768px){
 
 .hero{
     height:40vh;
-    padding:20px;
 }
 
-.hero-content h1{
+.hero h1{
     font-size:2rem;
 }
 
-.cards{
-    grid-template-columns:repeat(2,1fr);
+.channel-list{
+    width:240px;
 }
 
-.card-banner{
-    height:90px;
-    font-size:32px;
 }
 
-iframe{
-    height:60vh;
-}
-}
 </style>
 </head>
 <body>
@@ -191,98 +191,201 @@ iframe{
     <div class="logo">STREAMFLIX</div>
 </header>
 
-<div class="hero">
-    <div class="hero-content">
-        <h1>Unlimited IPTV Streaming</h1>
-        <p>Watch Live TV, Sports, Movies, Music, Kids & Entertainment Channels.</p>
+<section class="hero">
+    <h1>Unlimited IPTV Streaming</h1>
+</section>
+
+<div class="container">
+
+<input
+type="text"
+class="search"
+placeholder="Search Category...">
+
+<div class="grid">
+
+<div class="card" onclick="loadPlaylist('BDTV')">
+    <div class="poster">📺</div>
+    <div class="info">
+        <h3>BDTV</h3>
     </div>
 </div>
 
-<section class="section">
-    <h2 class="section-title">Browse Categories</h2>
-
-    <div class="cards" id="playlistGrid"></div>
-</section>
-
-<div class="modal" id="playerModal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3 id="playlistTitle">Playlist</h3>
-            <button class="close-btn" onclick="closeModal()">✕</button>
-        </div>
-
-        <iframe id="playlistFrame"></iframe>
+<div class="card" onclick="loadPlaylist('Sports')">
+    <div class="poster">⚽</div>
+    <div class="info">
+        <h3>Sports</h3>
     </div>
+</div>
+
+<div class="card" onclick="loadPlaylist('Movies')">
+    <div class="poster">🎬</div>
+    <div class="info">
+        <h3>Movies</h3>
+    </div>
+</div>
+
+<div class="card" onclick="loadPlaylist('Entertainment')">
+    <div class="poster">🎭</div>
+    <div class="info">
+        <h3>Entertainment</h3>
+    </div>
+</div>
+
+<div class="card" onclick="loadPlaylist('Music')">
+    <div class="poster">🎵</div>
+    <div class="info">
+        <h3>Music</h3>
+    </div>
+</div>
+
+<div class="card" onclick="loadPlaylist('News')">
+    <div class="poster">📰</div>
+    <div class="info">
+        <h3>News</h3>
+    </div>
+</div>
+
+<div class="card" onclick="loadPlaylist('Kids')">
+    <div class="poster">🧸</div>
+    <div class="info">
+        <h3>Kids</h3>
+    </div>
+</div>
+
+</div>
+</div>
+
+<!-- FULL SCREEN PLAYER -->
+
+<div class="player-overlay" id="playerOverlay">
+
+<button class="close-player" onclick="closePlayer()">
+✕
+</button>
+
+<div class="channel-list" id="channelList">
+    <h3>Channels</h3>
+</div>
+
+<video
+id="video"
+controls
+autoplay
+playsinline>
+</video>
+
 </div>
 
 <script>
 
-const playlists = [
-{
-    name:'BDTV',
-    icon:'📺',
-    url:'https://raw.githubusercontent.com/hasanraf/BDzone/refs/heads/main/BDTv.m3u.txt'
-},
-{
-    name:'Sports',
-    icon:'⚽',
-    url:'https://raw.githubusercontent.com/hasanraf/sports/refs/heads/main/sports.m3u'
-},
-{
-    name:'Entertainment',
-    icon:'🎭',
-    url:'https://raw.githubusercontent.com/hasanraf/entertainment/refs/heads/main/entertainment.m3u'
-},
-{
-    name:'Movies',
-    icon:'🎬',
-    url:'https://raw.githubusercontent.com/hasanraf/Movies/refs/heads/main/movie.m3u'
-},
-{
-    name:'Music',
-    icon:'🎵',
-    url:'https://raw.githubusercontent.com/hasanraf/musicandother/refs/heads/main/musicandother.m3u'
-},
-{
-    name:'News',
-    icon:'📰',
-    url:'https://raw.githubusercontent.com/hasanraf/News/refs/heads/main/news.m3u'
-},
-{
-    name:'Kids',
-    icon:'🧸',
-    url:'https://raw.githubusercontent.com/hasanraf/Kids/refs/heads/main/kids.m3u'
-}
-];
+const playlists = {
+BDTV:'https://raw.githubusercontent.com/hasanraf/BDzone/refs/heads/main/BDTv.m3u.txt',
+Sports:'https://raw.githubusercontent.com/hasanraf/sports/refs/heads/main/sports.m3u',
+Entertainment:'https://raw.githubusercontent.com/hasanraf/entertainment/refs/heads/main/entertainment.m3u',
+Movies:'https://raw.githubusercontent.com/hasanraf/Movies/refs/heads/main/movie.m3u',
+Music:'https://raw.githubusercontent.com/hasanraf/musicandother/refs/heads/main/musicandother.m3u',
+News:'https://raw.githubusercontent.com/hasanraf/News/refs/heads/main/news.m3u',
+Kids:'https://raw.githubusercontent.com/hasanraf/Kids/refs/heads/main/kids.m3u'
+};
 
-const grid = document.getElementById("playlistGrid");
+const video = document.getElementById('video');
 
-playlists.forEach(item => {
+async function loadPlaylist(category){
 
-    grid.innerHTML += `
-        <div class="card" onclick="openPlaylist('${item.name}','${item.url}')">
-            <div class="card-banner">${item.icon}</div>
-            <div class="card-body">
-                <h3>${item.name}</h3>
-                <p>Open Playlist</p>
-            </div>
-        </div>
-    `;
-});
+    document.getElementById('playerOverlay').classList.add('active');
 
-function openPlaylist(title,url){
+    const url = playlists[category];
 
-    document.getElementById("playlistTitle").innerText = title;
+    try{
 
-    document.getElementById("playlistFrame").src =
-    "https://m3u-editor.com/iptv-player/?url=" + encodeURIComponent(url);
+        const res = await fetch(url);
+        const text = await res.text();
 
-    document.getElementById("playerModal").style.display = "flex";
+        const lines = text.split('\n');
+
+        let channels = [];
+
+        for(let i=0;i<lines.length;i++){
+
+            if(lines[i].includes('#EXTINF')){
+
+                const name = lines[i].split(',').pop().trim();
+                const stream = lines[i+1]?.trim();
+
+                if(stream){
+                    channels.push({
+                        name,
+                        stream
+                    });
+                }
+            }
+        }
+
+        renderChannels(channels);
+
+        if(channels.length){
+            playChannel(channels[0].stream);
+        }
+
+    }catch(err){
+        alert('Playlist loading failed');
+        console.error(err);
+    }
 }
 
-function closeModal(){
-    document.getElementById("playerModal").style.display = "none";
-    document.getElementById("playlistFrame").src = "";
+function renderChannels(channels){
+
+    const box = document.getElementById('channelList');
+
+    box.innerHTML = '<h3>Channels</h3>';
+
+    channels.forEach(ch=>{
+
+        const div = document.createElement('div');
+
+        div.className='channel';
+
+        div.innerText=ch.name;
+
+        div.onclick=()=>{
+            playChannel(ch.stream);
+        }
+
+        box.appendChild(div);
+    });
+}
+
+function playChannel(url){
+
+    if(Hls.isSupported()){
+
+        const hls = new Hls();
+
+        hls.loadSource(url);
+
+        hls.attachMedia(video);
+
+    }else{
+
+        video.src=url;
+    }
+
+    video.play();
+
+    if(document.documentElement.requestFullscreen){
+        document.documentElement.requestFullscreen();
+    }
+}
+
+function closePlayer(){
+
+    video.pause();
+
+    video.src='';
+
+    document.getElementById('playerOverlay')
+    .classList.remove('active');
 }
 
 </script>
