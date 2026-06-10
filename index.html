@@ -3,9 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>IPTV Premium - Force Landscape</title>
+<title>IPTV Premium</title>
 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.css" />
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.min.js"></script>
+
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
@@ -15,6 +18,8 @@
     --card-bg: #111827;
     --hover-bg: #1f2937;
     --accent: #10b981;
+    /* Plyr Custom Color */
+    --plyr-color-main: #e50914;
 }
 
 * {
@@ -216,8 +221,8 @@ body {
     display: inline-block;
 }
 
-/* 🎯 FORCE LANDSCAPE PLAYER (১০০% পাতাল স্ক্রিন নিশ্চিত করার জন্য CSS) */
-.player {
+/* 🎯 PLYR ULTRA CONTAINER (মোবাইলে জোরপূর্বক পাতাল স্ক্রিনের জন্য) */
+.player-wrapper {
     position: fixed;
     top: 0;
     left: 0;
@@ -228,9 +233,9 @@ body {
     z-index: 99999;
 }
 
-/* মোবাইল সোজা থাকলেও এই ক্লাসটি ভিডিওকে জোর করে ঘুরিয়ে পাতাল করে দেবে */
+/* ফোন সোজা থাকলেও পুরো প্লেয়ারকে ঘুরিয়ে ল্যান্ডস্কেপ করার ম্যাজিক CSS */
 @media (orientation: portrait) {
-    .player.force-rotate {
+    .player-wrapper.force-landscape {
         width: 100vh !important;
         height: 100vw !important;
         transform: rotate(90deg);
@@ -241,39 +246,30 @@ body {
     }
 }
 
-.player video {
+.plyr {
     width: 100%;
     height: 100%;
-    object-fit: contain;
 }
 
-.player-controls {
+/* কাস্টম ক্লোজ বাটন যা প্লেয়ারের ওপর সুন্দরভাবে ভাসবে */
+.custom-close {
     position: absolute;
-    top: 20px;
-    left: 20px;
-    right: 20px;
-    display: flex;
-    justify-content: space-between;
-    z-index: 100000;
-    pointer-events: none;
-}
-
-.player-btn {
-    pointer-events: auto;
-    width: 40px;
-    height: 40px;
+    top: 15px;
+    left: 15px;
+    z-index: 100001;
+    background: var(--primary);
     border: none;
-    border-radius: 50%;
-    background: rgba(0,0,0,0.6);
     color: white;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
     font-size: 16px;
     cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
     display: flex;
     align-items: center;
     justify-content: center;
-    backdrop-filter: blur(5px);
 }
-.player-btn.close-btn { background: var(--primary); }
 
 @keyframes blink {
     0%, 100% { opacity: 1; }
@@ -304,12 +300,9 @@ body {
 <div class="tabs" id="tabs"></div>
 <div class="grid" id="grid"></div>
 
-<div class="player" id="player">
-    <div class="player-controls">
-        <button class="player-btn close-btn" onclick="closePlayer()">✕</button>
-        
-    </div>
-    <video id="video" controls autoplay playsinline></video>
+<div class="player-wrapper" id="playerWrapper">
+    <button class="custom-close" onclick="closePlayer()">✕</button>
+    <video id="player" playsinline controls></video>
 </div>
 
 <script>
@@ -360,7 +353,7 @@ function initFifaWidget() {
     });
 }
 
-// Tabs Generator
+// Tabs
 const tabs = document.getElementById("tabs");
 playlists.forEach((p, i) => {
     const tab = document.createElement("div");
@@ -370,7 +363,6 @@ playlists.forEach((p, i) => {
     tabs.appendChild(tab);
 });
 
-// Load M3U
 async function loadCategory(url, tab) {
     try {
         document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
@@ -428,63 +420,70 @@ function escapeHtml(str) {
     return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
 }
 
-// Advanced Video Player & Screen Orientation Control
+// Premium Plyr & HLS Integration
 let hls;
-const playerEl = document.getElementById("player");
-const videoEl = document.getElementById("video");
+let plyrPlayer;
+
+// Initialize Plyr once
+document.addEventListener('DOMContentLoaded', () => {
+    plyrPlayer = new Plyr('#player', {
+        controls: ['play-large', 'play', 'mute', 'volume', 'fullscreen', 'settings'],
+        fullscreen: { enabled: true, fallback: true, iosNative: true },
+        settings: ['quality', 'speed']
+    });
+});
 
 function playStream(url) {
-    playerEl.style.display = "block";
-    playerEl.classList.add("force-rotate"); // প্লে করার সাথে সাথেই পাতাল স্ক্রিন অন হবে
+    const wrapper = document.getElementById("playerWrapper");
+    const video = document.getElementById("player");
     
-    if (hls) hls.destroy();
-    videoEl.pause();
-    videoEl.src = "";
+    wrapper.style.display = "block";
+    wrapper.classList.add("force-landscape"); // প্লে করলেই পাতাল স্ক্রিন অ্যাক্টিভেট
 
-    // সিস্টেম ফুলস্ক্রিন রিকোয়েস্ট (সাপোর্টেড ডিভাইসের জন্য)
-    if (playerEl.requestFullscreen) {
-        playerEl.requestFullscreen().then(() => {
-            if (screen.orientation && screen.orientation.lock) {
+    // ওরিয়েন্টেশন এবং ফুলস্ক্রিন রিকোয়েস্ট (যদি ডিভাইস সাপোর্ট করে)
+    if (wrapper.requestFullscreen) {
+        wrapper.requestFullscreen().then(() => {
+            if(screen.orientation && screen.orientation.lock) {
                 screen.orientation.lock('landscape').catch(() => {});
             }
         }).catch(() => {});
-    } else if (videoEl.webkitEnterFullscreen) {
-        videoEl.webkitEnterFullscreen(); // iOS Safari সাপোর্ট
     }
 
-    // HLS Stream Loading
+    if (hls) hls.destroy();
+
     if (Hls.isSupported()) {
         hls = new Hls({ enableWorker: true, lowLatencyMode: true });
         hls.loadSource(url);
-        hls.attachMedia(videoEl);
-        hls.on(Hls.Events.MANIFEST_PARSED, () => videoEl.play().catch(e => console.log(e)));
-    } else if (videoEl.canPlayType("application/vnd.apple.mpegurl")) {
-        videoEl.src = url;
-        videoEl.play().catch(e => console.log(e));
+        hls.attachMedia(video);
+        hls.on(Hls.Events.MANIFEST_PARSED, () => {
+            plyrPlayer.play().catch(e => console.log(e));
+        });
+    } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
+        video.src = url;
+        plyrPlayer.play().catch(e => console.log(e));
     }
 }
 
-// ম্যানুয়ালি ওরিয়েন্টেশন সোজা-বাঁকা করার বাটন লজিক
-function toggleRotateFallback() {
-    playerEl.classList.toggle("force-rotate");
-}
-
 function closePlayer() {
-    playerEl.style.display = "none";
-    playerEl.classList.remove("force-rotate");
-    videoEl.pause();
-    videoEl.src = "";
+    const wrapper = document.getElementById("playerWrapper");
+    const video = document.getElementById("player");
+
+    wrapper.style.display = "none";
+    wrapper.classList.remove("force-landscape");
+    
+    plyrPlayer.pause();
+    video.src = "";
     
     if (document.fullscreenElement) document.exitFullscreen();
     if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock();
     if (hls) { hls.destroy(); hls = null; }
 }
 
-// ফুলস্ক্রিন থেকে এক্সিট করলে যেন ওরিয়েন্টেশন রিসেট হয়
+// ফোনের নিজস্ব ব্যাক বাটন দিয়ে ফুলস্ক্রিন কাটলে প্লেয়ার ক্লোজ করার লজিক
 document.addEventListener('fullscreenchange', () => {
     if (!document.fullscreenElement) {
-        playerEl.classList.remove("force-rotate");
-        if(playerEl.style.display === "block") {
+        document.getElementById("playerWrapper").classList.remove("force-landscape");
+        if(document.getElementById("playerWrapper").style.display === "block") {
             closePlayer();
         }
     }
