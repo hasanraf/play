@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>IPTV Premium </title>
+<title>IPTV Premium</title>
 
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -216,26 +216,29 @@ body {
     display: inline-block;
 }
 
-/* ADVANCED ADVANCED POWER PLAYER (মোবাইলে ফুল উইডথ রোটেশন লকসহ) */
+/* 🎯 FORCE LANDSCAPE PLAYER (১০০% পাতাল স্ক্রিন নিশ্চিত করার জন্য CSS) */
 .player {
     position: fixed;
-    inset: 0;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
     background: black;
     display: none;
     z-index: 99999;
-    width: 100vw;
-    height: 100vh;
 }
 
-/* ফুলস্ক্রিনে বা ল্যান্ডস্কেপ মোডে জোরপূর্বক রোটেশন হ্যান্ডেল করার CSS */
-.player.landscape-mode {
-    width: 100vh !important;
-    height: 100vw !important;
-    transform: rotate(90deg);
-    transform-origin: bottom left;
-    position: fixed;
-    top: -100vw;
-    left: 0;
+/* মোবাইল সোজা থাকলেও এই ক্লাসটি ভিডিওকে জোর করে ঘুরিয়ে পাতাল করে দেবে */
+@media (orientation: portrait) {
+    .player.force-rotate {
+        width: 100vh !important;
+        height: 100vw !important;
+        transform: rotate(90deg);
+        transform-origin: top left;
+        position: fixed;
+        top: 0;
+        left: 100vw;
+    }
 }
 
 .player video {
@@ -246,9 +249,9 @@ body {
 
 .player-controls {
     position: absolute;
-    top: 15px;
-    left: 15px;
-    right: 15px;
+    top: 20px;
+    left: 20px;
+    right: 20px;
     display: flex;
     justify-content: space-between;
     z-index: 100000;
@@ -257,19 +260,18 @@ body {
 
 .player-btn {
     pointer-events: auto;
-    width: 42px;
-    height: 42px;
+    width: 40px;
+    height: 40px;
     border: none;
     border-radius: 50%;
     background: rgba(0,0,0,0.6);
     color: white;
-    font-size: 18px;
+    font-size: 16px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     backdrop-filter: blur(5px);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
 }
 .player-btn.close-btn { background: var(--primary); }
 
@@ -305,7 +307,7 @@ body {
 <div class="player" id="player">
     <div class="player-controls">
         <button class="player-btn close-btn" onclick="closePlayer()">✕</button>
-        <button class="player-btn" onclick="forceLandscapeToggle()">⛶</button>
+        <button class="player-btn" onclick="toggleRotateFallback()">⛶</button>
     </div>
     <video id="video" controls autoplay playsinline></video>
 </div>
@@ -433,21 +435,26 @@ const videoEl = document.getElementById("video");
 
 function playStream(url) {
     playerEl.style.display = "block";
+    playerEl.classList.add("force-rotate"); // প্লে করার সাথে সাথেই পাতাল স্ক্রিন অন হবে
+    
     if (hls) hls.destroy();
     videoEl.pause();
     videoEl.src = "";
 
-    // অটোমেটিক রোটেশন এবং ফুলস্ক্রিন অ্যাক্টিভেট করার চেষ্টা করবে
-    setTimeout(() => { 
-        forceLandscapeToggle(true); 
-    }, 200);
+    // সিস্টেম ফুলস্ক্রিন রিকোয়েস্ট (সাপোর্টেড ডিভাইসের জন্য)
+    if (playerEl.requestFullscreen) {
+        playerEl.requestFullscreen().then(() => {
+            if (screen.orientation && screen.orientation.lock) {
+                screen.orientation.lock('landscape').catch(() => {});
+            }
+        }).catch(() => {});
+    } else if (videoEl.webkitEnterFullscreen) {
+        videoEl.webkitEnterFullscreen(); // iOS Safari সাপোর্ট
+    }
 
+    // HLS Stream Loading
     if (Hls.isSupported()) {
-        hls = new Hls({ 
-            enableWorker: true, 
-            lowLatencyMode: true,
-            backBufferLength: 90 // বাফারিং ছাড়াই স্মুথ প্লে ব্যাকের জন্য
-        });
+        hls = new Hls({ enableWorker: true, lowLatencyMode: true });
         hls.loadSource(url);
         hls.attachMedia(videoEl);
         hls.on(Hls.Events.MANIFEST_PARSED, () => videoEl.play().catch(e => console.log(e)));
@@ -457,42 +464,14 @@ function playStream(url) {
     }
 }
 
-// স্মার্ট ফুলস্ক্রিন ও ফোর্সড ল্যান্ডস্কেপ (মোবাইল উইডথ বড় করার ফাংশন)
-function forceLandscapeToggle(autoRequest = false) {
-    const isFullscreen = document.fullscreenElement;
-    
-    if (!isFullscreen && autoRequest) {
-        if (playerEl.requestFullscreen) {
-            playerEl.requestFullscreen().then(() => {
-                if (screen.orientation && screen.orientation.lock) {
-                    screen.orientation.lock('landscape').catch(() => {
-                        // যদি ব্রাউজার ওরিয়েন্টেশন লক সাপোর্ট না করে তবে CSS দিয়ে রোটেশন জোরপূর্বক করবে
-                        playerEl.classList.add("landscape-mode");
-                    });
-                } else {
-                    playerEl.classList.add("landscape-mode");
-                }
-            }).catch(() => {
-                // ইনলাইন জুম ও উইডথ বাড়ানোর ব্যাকআপ ট্রিকার
-                playerEl.classList.add("landscape-mode");
-            });
-        } else if (videoEl.webkitEnterFullscreen) {
-            videoEl.webkitEnterFullscreen(); // iOS / Safari সাপোর্ট
-        }
-    } else {
-        // ম্যানুয়াল টগল ব্যাক
-        if (playerEl.classList.contains("landscape-mode")) {
-            playerEl.classList.remove("landscape-mode");
-            if (document.fullscreenElement) document.exitFullscreen();
-        } else {
-            playerEl.classList.add("landscape-mode");
-        }
-    }
+// ম্যানুয়ালি ওরিয়েন্টেশন সোজা-বাঁকা করার বাটন লজিক
+function toggleRotateFallback() {
+    playerEl.classList.toggle("force-rotate");
 }
 
 function closePlayer() {
     playerEl.style.display = "none";
-    playerEl.classList.remove("landscape-mode");
+    playerEl.classList.remove("force-rotate");
     videoEl.pause();
     videoEl.src = "";
     
@@ -501,10 +480,10 @@ function closePlayer() {
     if (hls) { hls.destroy(); hls = null; }
 }
 
-// মোবাইলের ব্যাক বাটন বা হোম সোয়াইপ দিয়ে ফুলস্ক্রিন থেকে বের হলে প্লেয়ার বন্ধ হবে
+// ফুলস্ক্রিন থেকে এক্সিট করলে যেন ওরিয়েন্টেশন রিসেট হয়
 document.addEventListener('fullscreenchange', () => {
     if (!document.fullscreenElement) {
-        playerEl.classList.remove("landscape-mode");
+        playerEl.classList.remove("force-rotate");
         if(playerEl.style.display === "block") {
             closePlayer();
         }
