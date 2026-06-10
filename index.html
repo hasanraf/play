@@ -158,7 +158,7 @@ color:red;
 </head>
 <body>
 
-<div class="header">📺Free Live Tv</div>
+<div class="header">📺 Free Live Tv</div>
 
 <div class="tabs" id="tabs"></div>
 
@@ -174,9 +174,9 @@ color:red;
 
 <script>
 
-/* PLAYLISTS */
+/* PLAYLISTS - Fifa100 added first */
 const playlists = [
-{name:'FIFA',url:'https://raw.githubusercontent.com/hasanraf/FIfa/main/Fifa100.m3u'},
+{name:'Fifa100',url:'https://raw.githubusercontent.com/hasanraf/FIfa/refs/heads/main/Fifa100.m3u'},
 {name:'BDTV',url:'https://raw.githubusercontent.com/hasanraf/BDzone/refs/heads/main/BDTv.m3u'},
 {name:'Sports',url:'https://raw.githubusercontent.com/hasanraf/sports/refs/heads/main/sports.m3u'},
 {name:'Entertainment',url:'https://raw.githubusercontent.com/hasanraf/entertainment/refs/heads/main/entertainment.m3u'},
@@ -230,20 +230,29 @@ for(let i=0;i<lines.length;i++){
 
 if(lines[i].includes("#EXTINF")){
 
-const name=lines[i].split(",")[1]||"Channel";
+const nameLine = lines[i];
+let name = nameLine.split(",")[1] || "Channel";
+
+// Clean name (remove extra spaces)
+name = name.trim();
 
 const stream=lines[i+1]?.trim();
 
 if(stream && stream.startsWith("http")){
 
-let logoMatch=lines[i].match(/tvg-logo="(.*?)"/);
-let logo=logoMatch?logoMatch[1]:"https://via.placeholder.com/70";
+// Try to get logo from tvg-logo attribute
+let logoMatch = nameLine.match(/tvg-logo="(.*?)"/);
+let logo = logoMatch ? logoMatch[1] : "https://via.placeholder.com/70";
+
+// Try to get group title
+let groupMatch = nameLine.match(/group-title="(.*?)"/);
+let group = groupMatch ? groupMatch[1] : tab.innerText;
 
 channels.push({
 name,
 url:stream,
 logo,
-group:tab.innerText
+group: group
 });
 
 }
@@ -254,7 +263,16 @@ group:tab.innerText
 
 currentChannels=channels;
 
+if(channels.length === 0) {
+document.getElementById("grid").innerHTML=`
+<div class="error">
+⚠️ No channels found in this playlist<br>
+The M3U file format might be different
+</div>
+`;
+} else {
 render(channels);
+}
 
 }catch(err){
 
@@ -263,7 +281,8 @@ console.log(err);
 document.getElementById("grid").innerHTML=`
 <div class="error">
 ⚠️ Failed to load channels<br>
-Check internet or M3U link
+Check internet or M3U link<br>
+Error: ${err.message}
 </div>
 `;
 
@@ -280,14 +299,17 @@ grid.innerHTML="";
 
 list.forEach(ch=>{
 
+// Escape special characters in name for safety
+const safeName = ch.name.replace(/'/g, "\\'");
+
 grid.innerHTML+=`
-<div class="card" onclick="play('${ch.url}')">
+<div class="card" onclick="play('${ch.url.replace(/'/g, "\\'")}')">
 
 <img class="logo" src="${ch.logo}" onerror="this.src='https://via.placeholder.com/70'">
 
-<div class="name">${ch.name}</div>
+<div class="name">${escapeHtml(ch.name)}</div>
 
-<div class="group">${ch.group}</div>
+<div class="group">${escapeHtml(ch.group)}</div>
 
 <div class="live">LIVE</div>
 
@@ -296,6 +318,17 @@ grid.innerHTML+=`
 
 });
 
+}
+
+// Helper function to escape HTML
+function escapeHtml(str) {
+if (!str) return '';
+return str.replace(/[&<>]/g, function(m) {
+if (m === '&') return '&amp;';
+if (m === '<') return '&lt;';
+if (m === '>') return '&gt;';
+return m;
+});
 }
 
 /* PLAYER */
@@ -309,21 +342,57 @@ const video=document.getElementById("video");
 
 if(hls) hls.destroy();
 
+// Reset video source
+video.pause();
+video.src = "";
+
 if(Hls.isSupported()){
 
-hls=new Hls();
+hls=new Hls({
+debug: false,
+enableWorker: true,
+lowLatencyMode: true,
+backBufferLength: 60
+});
+
 hls.loadSource(url);
 hls.attachMedia(video);
 
 hls.on(Hls.Events.MANIFEST_PARSED,()=>{
-video.play();
+video.play().catch(e => console.log("Play error:", e));
 });
+
+hls.on(Hls.Events.ERROR, (event, data) => {
+console.log("HLS Error:", data);
+if(data.fatal) {
+switch(data.type) {
+case Hls.ErrorTypes.NETWORK_ERROR:
+hls.startLoad();
+break;
+case Hls.ErrorTypes.MEDIA_ERROR:
+hls.recoverMediaError();
+break;
+default:
+closePlayer();
+break;
+}
+}
+});
+
+}else if(video.canPlayType("application/vnd.apple.mpegurl")){
+
+video.src=url;
+video.play().catch(e => console.log("Play error:", e));
 
 }else{
 
-video.src=url;
-video.play();
-
+console.log("HLS not supported");
+document.getElementById("grid").innerHTML += `
+<div class="error">
+⚠️ Your browser doesn't support HLS streaming
+</div>
+`;
+closePlayer();
 }
 
 }
@@ -338,11 +407,14 @@ const video=document.getElementById("video");
 video.pause();
 video.src="";
 
-if(hls) hls.destroy();
+if(hls) {
+hls.destroy();
+hls = null;
+}
 
 }
 
-/* AUTO LOAD FIX */
+/* AUTO LOAD FIRST TAB (Fifa100) */
 window.onload=function(){
 
 const firstTab=document.querySelector(".tab");
