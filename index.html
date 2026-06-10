@@ -2,187 +2,331 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>IPTV Stable</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<title>IPTV Pro • Premium Video Player</title>
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <style>
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Inter', sans-serif;
 }
 
 body {
-    background: #0b1220;
-    color: white;
+    background: #0a0f1a;
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
 }
 
-/* HEADER */
+/* Header */
 .header {
-    padding: 18px;
+    padding: 16px 20px;
     font-size: 22px;
-    font-weight: 700;
-    background: #111827;
+    font-weight: 800;
+    background: linear-gradient(135deg, #0f172a 0%, #111827 100%);
     position: sticky;
     top: 0;
     z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
 }
 
-/* TABS */
+.header span {
+    background: linear-gradient(135deg, #e50914, #ff6b6b);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* Tabs */
 .tabs {
     display: flex;
-    gap: 10px;
-    padding: 12px;
+    gap: 12px;
+    padding: 14px 16px;
     overflow-x: auto;
     scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+    background: #0f172a;
+    border-bottom: 1px solid #1e293b;
 }
 
 .tab {
-    padding: 10px 16px;
-    background: #1f2937;
-    border-radius: 999px;
+    padding: 8px 20px;
+    background: #1e293b;
+    border-radius: 40px;
     white-space: nowrap;
     cursor: pointer;
     font-size: 14px;
-    transition: all 0.2s;
+    font-weight: 600;
+    transition: all 0.25s ease;
+    flex-shrink: 0;
+    letter-spacing: 0.3px;
 }
 
 .tab.active {
     background: #e50914;
-    box-shadow: 0 2px 8px rgba(229,9,20,0.4);
+    box-shadow: 0 4px 15px rgba(229,9,20,0.4);
+    transform: scale(1.02);
 }
 
-/* GRID */
+/* Grid */
 .grid {
-    padding: 15px;
+    padding: 18px;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+    gap: 14px;
 }
 
-/* CARD */
 .card {
-    background: #111827;
-    border-radius: 14px;
-    padding: 12px;
+    background: linear-gradient(135deg, #111827, #0f172a);
+    border-radius: 20px;
+    padding: 14px 12px;
     cursor: pointer;
-    transition: 0.2s;
+    transition: all 0.25s ease;
     text-align: center;
     border: 1px solid #1e2a3a;
+    backdrop-filter: blur(4px);
 }
 
-.card:hover {
-    transform: scale(1.03);
+.card:active {
+    transform: scale(0.97);
     background: #1f2937;
     border-color: #e50914;
 }
 
-/* LOGO */
 .logo {
-    width: 70px;
-    height: 70px;
+    width: 75px;
+    height: 75px;
     object-fit: contain;
-    border-radius: 12px;
-    margin-bottom: 8px;
-    background: #0f172a;
+    border-radius: 16px;
+    margin-bottom: 10px;
+    background: #0a0f1a;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 
-/* NAME & GROUP */
 .name {
-    font-weight: 600;
-    font-size: 14px;
-    word-break: break-word;
+    font-weight: 700;
+    font-size: 13px;
+    line-height: 1.3;
+    margin-top: 5px;
 }
 
 .group {
-    font-size: 12px;
-    opacity: .7;
+    font-size: 11px;
+    opacity: 0.6;
     margin-top: 4px;
 }
 
-/* LIVE BADGE */
 .live {
-    background: red;
+    background: #e50914;
     display: inline-block;
-    padding: 3px 8px;
-    border-radius: 10px;
-    font-size: 10px;
-    margin-top: 6px;
+    padding: 3px 12px;
+    border-radius: 20px;
+    font-size: 9px;
+    font-weight: 800;
+    margin-top: 8px;
     animation: pulse 1.5s infinite;
 }
 
 @keyframes pulse {
-    0% { box-shadow: 0 0 0 0 rgba(255,0,0,.7); }
-    100% { box-shadow: 0 0 0 12px rgba(255,0,0,0); }
+    0% { box-shadow: 0 0 0 0 rgba(229,9,20,0.6); }
+    100% { box-shadow: 0 0 0 10px rgba(229,9,20,0); }
 }
 
-/* PLAYER OVERLAY */
-.player {
+/* ========= PREMIUM VIDEO PLAYER ========= */
+.video-player-container {
     position: fixed;
     inset: 0;
-    background: black;
-    display: none;
+    background: #000;
     z-index: 99999;
+    display: none;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    width: 100%;
+    height: 100%;
+    animation: fadeIn 0.3s ease;
 }
 
-.player video {
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.video-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#premiumVideo {
     width: 100%;
     height: 100%;
     object-fit: contain;
-    transition: transform 0.2s;
+    background: #000;
 }
 
-/* CONTROL BAR ON TOP */
-.player-controls {
+/* Custom Controls Overlay */
+.custom-controls {
     position: absolute;
-    top: 15px;
-    right: 15px;
-    left: 15px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 60%, transparent 100%);
+    padding: 20px 16px 16px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 100;
+}
+
+.video-wrapper:hover .custom-controls,
+.video-wrapper.touch-controls .custom-controls {
+    opacity: 1;
+}
+
+.controls-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+
+.ctrl-btn {
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(8px);
+    border: none;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 18px;
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ctrl-btn:hover, .ctrl-btn:active {
+    background: #e50914;
+    transform: scale(1.05);
+}
+
+.progress-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.progress-bar {
+    flex: 1;
+    height: 5px;
+    background: rgba(255,255,255,0.3);
+    border-radius: 5px;
+    cursor: pointer;
+    position: relative;
+}
+
+.progress-fill {
+    height: 100%;
+    background: #e50914;
+    border-radius: 5px;
+    width: 0%;
+    position: relative;
+    transition: width 0.1s linear;
+}
+
+.time-display {
+    font-size: 13px;
+    font-weight: 500;
+    font-family: monospace;
+    color: #fff;
+    background: rgba(0,0,0,0.6);
+    padding: 4px 8px;
+    border-radius: 20px;
+}
+
+.volume-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0,0,0,0.5);
+    padding: 5px 10px;
+    border-radius: 30px;
+}
+
+.volume-slider {
+    width: 70px;
+    height: 4px;
+    cursor: pointer;
+    background: rgba(255,255,255,0.3);
+    border-radius: 4px;
+}
+
+.volume-fill {
+    width: 80%;
+    height: 100%;
+    background: #e50914;
+    border-radius: 4px;
+}
+
+.quality-selector, .speed-selector {
+    background: rgba(0,0,0,0.7);
+    border: none;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.top-controls {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    left: 18px;
     display: flex;
     justify-content: flex-end;
     gap: 12px;
-    z-index: 100001;
+    z-index: 101;
     pointer-events: none;
 }
 
-.player-controls button {
+.top-controls button {
     pointer-events: auto;
     width: 48px;
     height: 48px;
     border-radius: 50%;
     background: rgba(0,0,0,0.7);
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(255,255,255,0.3);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.2);
     color: white;
-    font-size: 22px;
+    font-size: 20px;
     cursor: pointer;
     transition: 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
 }
 
-.player-controls button:hover {
+.top-controls button:active {
+    transform: scale(0.92);
     background: #e50914;
-    transform: scale(1.05);
 }
 
-.close-btn {
-    background: rgba(229,9,20,0.9);
-}
-
-.rotate-btn {
-    background: rgba(0,0,0,0.7);
-}
-
-/* ERROR MESSAGE */
-.error {
+.error-msg {
     text-align: center;
     padding: 20px;
     color: #ff8a8a;
@@ -191,48 +335,83 @@ body {
     margin: 20px;
 }
 
-/* RESPONSIVE: better grid on tablets */
-@media (min-width: 600px) {
-    .grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
-}
-
-@media (min-width: 900px) {
-    .grid {
-        grid-template-columns: repeat(4, 1fr);
-    }
-}
-
-/* loading indicator */
 .loading {
     text-align: center;
-    padding: 40px;
-    color: #ccc;
-    font-style: italic;
+    padding: 50px;
+    color: #aaa;
+    font-size: 14px;
+}
+
+@media (min-width: 600px) {
+    .grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (min-width: 900px) {
+    .grid { grid-template-columns: repeat(4, 1fr); }
+}
+@media (max-width: 600px) {
+    .volume-control { display: none; }
+    .quality-selector, .speed-selector { font-size: 10px; padding: 4px 8px; }
+    .ctrl-btn { width: 36px; height: 36px; font-size: 14px; }
 }
 </style>
 </head>
 <body>
 
-<div class="header">📺 Free Live TV</div>
+<div class="header">
+    📺 IPTV PRO • HD STREAM
+    <span><i class="fas fa-rotate-right"></i> Rotate → Fullscreen</span>
+</div>
 
 <div class="tabs" id="tabs"></div>
 
 <div class="grid" id="grid">
-    <div class="loading">📡 Loading channels... please wait</div>
+    <div class="loading"><i class="fas fa-spinner fa-pulse"></i> Loading channels...</div>
 </div>
 
-<div class="player" id="player">
-    <div class="player-controls">
-        <button class="rotate-btn" id="rotateScreenBtn" title="Rotate Screen (Landscape/Portrait)">🔄</button>
-        <button class="close-btn" id="closePlayerBtn" title="Close Player">✕</button>
+<!-- Premium Video Player -->
+<div class="video-player-container" id="videoPlayerContainer">
+    <div class="top-controls">
+        <button id="rotateFullscreenBtn" title="Rotate + Fullscreen"><i class="fas fa-arrows-alt"></i> <i class="fas fa-mobile-alt"></i></button>
+        <button id="closePlayerBtn" title="Close"><i class="fas fa-times"></i></button>
     </div>
-    <video id="video" controls autoplay playsinline></video>
+    <div class="video-wrapper" id="videoWrapper">
+        <video id="premiumVideo" playsinline webkit-playsinline></video>
+        
+        <!-- Custom Controls -->
+        <div class="custom-controls" id="customControls">
+            <div class="controls-row">
+                <button class="ctrl-btn" id="playPauseBtn"><i class="fas fa-play"></i></button>
+                <div class="progress-container">
+                    <div class="progress-bar" id="progressBar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <span class="time-display" id="timeDisplay">0:00 / 0:00</span>
+                </div>
+                <button class="ctrl-btn" id="volumeBtn"><i class="fas fa-volume-up"></i></button>
+                <div class="volume-control">
+                    <div class="progress-bar volume-slider" id="volumeSlider">
+                        <div class="volume-fill" id="volumeFill"></div>
+                    </div>
+                </div>
+                <select class="quality-selector" id="qualitySelector">
+                    <option value="auto">Auto</option>
+                </select>
+                <select class="speed-selector" id="speedSelector">
+                    <option value="0.5">0.5x</option>
+                    <option value="0.75">0.75x</option>
+                    <option value="1" selected>1x</option>
+                    <option value="1.25">1.25x</option>
+                    <option value="1.5">1.5x</option>
+                    <option value="2">2x</option>
+                </select>
+                <button class="ctrl-btn" id="fullscreenBtn"><i class="fas fa-expand"></i></button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
-/* ========= PLAYLISTS - Fifa2026 first as requested ========= */
+/* ========= PLAYLISTS ========= */
 const playlists = [
     { name: 'Fifa2026', url: 'https://raw.githubusercontent.com/hasanraf/FIfa/refs/heads/main/Fifa2026.m3u' },
     { name: 'BDTV', url: 'https://raw.githubusercontent.com/hasanraf/BDzone/refs/heads/main/BDTv.m3u' },
@@ -247,349 +426,320 @@ const playlists = [
 
 let currentChannels = [];
 let hls = null;
-let currentVideoUrl = '';
+let currentVideo = null;
 
-/* Helper: escape HTML */
+/* DOM Elements */
+const tabsDiv = document.getElementById("tabs");
+const gridDiv = document.getElementById("grid");
+const playerContainer = document.getElementById("videoPlayerContainer");
+const video = document.getElementById("premiumVideo");
+const playPauseBtn = document.getElementById("playPauseBtn");
+const progressBar = document.getElementById("progressBar");
+const progressFill = document.getElementById("progressFill");
+const timeDisplay = document.getElementById("timeDisplay");
+const volumeBtn = document.getElementById("volumeBtn");
+const volumeSlider = document.getElementById("volumeSlider");
+const volumeFill = document.getElementById("volumeFill");
+const fullscreenBtn = document.getElementById("fullscreenBtn");
+const speedSelector = document.getElementById("speedSelector");
+const rotateFullscreenBtn = document.getElementById("rotateFullscreenBtn");
+const closePlayerBtn = document.getElementById("closePlayerBtn");
+const customControls = document.getElementById("customControls");
+const videoWrapper = document.getElementById("videoWrapper");
+
+let isPlaying = false;
+let isVideoReady = false;
+
+/* Helper */
 function escapeHtml(str) {
     if (!str) return '';
-    return str.replace(/[&<>]/g, function(m) {
-        if (m === '&') return '&amp;';
-        if (m === '<') return '&lt;';
-        if (m === '>') return '&gt;';
-        return m;
-    });
+    return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;');
 }
 
-/* ========= CREATE TABS ========= */
-const tabsContainer = document.getElementById("tabs");
+/* Create Tabs */
 playlists.forEach((p, idx) => {
     const tab = document.createElement("div");
     tab.className = "tab";
     if (idx === 0) tab.classList.add("active");
     tab.innerText = p.name;
     tab.onclick = () => loadCategory(p.url, tab);
-    tabsContainer.appendChild(tab);
+    tabsDiv.appendChild(tab);
 });
 
-/* ========= LOAD M3U ========= */
+/* Load M3U */
 async function loadCategory(url, tabElement) {
     try {
-        // Show loading inside grid
-        const gridDiv = document.getElementById("grid");
-        gridDiv.innerHTML = `<div class="loading">⏳ Loading ${tabElement.innerText} channels...</div>`;
-        
-        // update active tab style
+        gridDiv.innerHTML = `<div class="loading"><i class="fas fa-spinner fa-pulse"></i> Loading ${tabElement.innerText}...</div>`;
         document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
         tabElement.classList.add("active");
-
-        const response = await fetch(url);
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const m3uText = await response.text();
-        const lines = m3uText.split(/\r?\n/);
         
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const text = await res.text();
+        const lines = text.split(/\r?\n/);
         let channels = [];
+        
         for (let i = 0; i < lines.length; i++) {
-            const line = lines[i];
-            if (line && line.includes("#EXTINF")) {
-                const extinfLine = line;
-                let channelName = extinfLine.split(",")[1] || "Channel";
-                channelName = channelName.trim();
-                
-                // get stream URL (next line)
-                let streamUrl = (i + 1 < lines.length) ? lines[i + 1]?.trim() : "";
-                if (streamUrl && (streamUrl.startsWith("http://") || streamUrl.startsWith("https://"))) {
-                    // Extract logo
-                    let logoMatch = extinfLine.match(/tvg-logo="(.*?)"/);
-                    let logo = logoMatch ? logoMatch[1] : "https://via.placeholder.com/70?text=TV";
-                    
-                    // Extract group
-                    let groupMatch = extinfLine.match(/group-title="(.*?)"/);
-                    let group = groupMatch ? groupMatch[1] : tabElement.innerText;
-                    
-                    channels.push({
-                        name: channelName,
-                        url: streamUrl,
-                        logo: logo,
-                        group: group
-                    });
+            if (lines[i] && lines[i].includes("#EXTINF")) {
+                const extinf = lines[i];
+                let name = extinf.split(",")[1] || "Channel";
+                name = name.trim();
+                const streamUrl = lines[i+1]?.trim();
+                if (streamUrl && streamUrl.startsWith("http")) {
+                    const logoMatch = extinf.match(/tvg-logo="(.*?)"/);
+                    const logo = logoMatch ? logoMatch[1] : "https://via.placeholder.com/70?text=TV";
+                    const groupMatch = extinf.match(/group-title="(.*?)"/);
+                    const group = groupMatch ? groupMatch[1] : tabElement.innerText;
+                    channels.push({ name, url: streamUrl, logo, group });
                 }
             }
         }
-        
         currentChannels = channels;
-        if (channels.length === 0) {
-            document.getElementById("grid").innerHTML = `
-                <div class="error">
-                    ⚠️ No channels found in this playlist.<br>
-                    The M3U might be empty or format is different.
-                </div>`;
-        } else {
-            renderChannels(channels);
-        }
+        if (channels.length === 0) gridDiv.innerHTML = `<div class="error-msg">⚠️ No channels found</div>`;
+        else renderChannels(channels);
     } catch (err) {
-        console.error(err);
-        document.getElementById("grid").innerHTML = `
-            <div class="error">
-                ❌ Failed to load channels<br>
-                ${err.message}<br>
-                Check link or network.
-            </div>`;
+        gridDiv.innerHTML = `<div class="error-msg">❌ Error: ${err.message}</div>`;
     }
 }
 
-/* ========= RENDER GRID ========= */
-function renderChannels(channelsList) {
-    const grid = document.getElementById("grid");
-    grid.innerHTML = "";
-    channelsList.forEach(ch => {
-        // Escape name for onclick
-        const safeUrl = ch.url.replace(/'/g, "\\'").replace(/"/g, '&quot;');
-        const escapedName = escapeHtml(ch.name);
-        const escapedGroup = escapeHtml(ch.group);
-        const logoUrl = ch.logo || "https://via.placeholder.com/70";
-        
+function renderChannels(list) {
+    gridDiv.innerHTML = "";
+    list.forEach(ch => {
         const card = document.createElement("div");
         card.className = "card";
-        card.setAttribute("data-url", ch.url);
-        card.onclick = (function(url) {
-            return function() { playStream(url); };
-        })(ch.url);
-        
+        card.onclick = () => initPremiumPlayer(ch.url);
         card.innerHTML = `
-            <img class="logo" src="${logoUrl}" onerror="this.src='https://via.placeholder.com/70?text=No+Logo'">
-            <div class="name">${escapedName}</div>
-            <div class="group">${escapedGroup}</div>
-            <div class="live">LIVE</div>
+            <img class="logo" src="${ch.logo}" onerror="this.src='https://via.placeholder.com/70?text=TV'">
+            <div class="name">${escapeHtml(ch.name)}</div>
+            <div class="group">${escapeHtml(ch.group)}</div>
+            <div class="live"><i class="fas fa-circle"></i> LIVE</div>
         `;
-        grid.appendChild(card);
+        gridDiv.appendChild(card);
     });
 }
 
-/* ========= PLAYER WITH SCREEN ROTATION SUPPORT ========= */
-const playerOverlay = document.getElementById("player");
-const videoElement = document.getElementById("video");
-const closePlayerBtn = document.getElementById("closePlayerBtn");
-const rotateBtn = document.getElementById("rotateScreenBtn");
+/* ========= PREMIUM VIDEO PLAYER LOGIC ========= */
+let currentStreamUrl = "";
 
-// Close player function (global)
-window.closePlayer = function() {
-    playerOverlay.style.display = "none";
-    if (videoElement) {
-        videoElement.pause();
-        videoElement.src = "";
-        videoElement.load();
-    }
+function initPremiumPlayer(url) {
+    if (!url) return;
+    currentStreamUrl = url;
+    
+    // Reset HLS
     if (hls) {
         hls.destroy();
         hls = null;
     }
-    // reset any orientation lock if needed (just exit fullscreen style)
-    if (document.exitFullscreen && document.fullscreenElement) {
-        document.exitFullscreen().catch(e => console.log("exit fs", e));
-    }
-    // Remove forced orientation styles if any
-    document.body.style.transform = "";
-};
-
-// Close button event
-closePlayerBtn.addEventListener("click", () => {
-    closePlayer();
-});
-
-/* SCREEN ROTATE BUTTON — toggles between landscape and portrait using screen.orientation API + CSS fallback */
-function rotateScreen() {
-    // Modern approach: use Screen Orientation API if available & secure context
-    if (screen.orientation && screen.orientation.lock) {
-        // Check current orientation and toggle between landscape-primary and portrait
-        const currentType = screen.orientation.type;
-        try {
-            if (currentType.includes("landscape")) {
-                screen.orientation.lock("portrait").catch(err => {
-                    console.warn("Orientation lock error:", err);
-                    fallbackRotateCSS();
-                });
-            } else {
-                screen.orientation.lock("landscape").catch(err => {
-                    console.warn("Orientation lock error:", err);
-                    fallbackRotateCSS();
-                });
-            }
-        } catch (err) {
-            fallbackRotateCSS();
-        }
-    } else {
-        // Fallback: for browsers without lock API, apply CSS transform to video container or body?
-        fallbackRotateCSS();
-    }
-}
-
-// fallback using CSS transform on video for rotation effect (affects only video orientation visually)
-function fallbackRotateCSS() {
-    // Instead of rotating whole body which may break UI, we rotate the video element itself while keeping controls usable.
-    // But better rotate the player container. We'll apply a temporary rotation on the player overlay.
-    const playerDiv = document.getElementById("player");
-    const currentRotate = playerDiv.style.transform;
-    if (!currentRotate || currentRotate === "none" || currentRotate === "") {
-        playerDiv.style.transform = "rotate(90deg)";
-        // Adjust video object-fit: contain may need width/height fix
-        playerDiv.style.width = "100%";
-        playerDiv.style.height = "100%";
-        // fix positioning
-        playerDiv.style.transformOrigin = "center center";
-        // Also we need to adjust close button experience? but it's fine.
-        // to avoid clipping, set body overflow hidden maybe
-        document.body.style.overflow = "hidden";
-        setTimeout(() => {
-            // set back after orientation if needed? we'll provide double click to revert
-        }, 100);
-    } else {
-        playerDiv.style.transform = "";
-        document.body.style.overflow = "";
-    }
-}
-
-// advanced: also listen to fullscreen changes for better rotation
-rotateBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    rotateScreen();
-});
-
-/* Advanced: use fullscreen + orientation API to make rotation natural */
-function enterFullscreenAndRotate() {
-    const video = videoElement;
-    if (video.requestFullscreen) {
-        video.requestFullscreen().then(() => {
-            // After fullscreen, trigger rotation if needed
-            if (screen.orientation && screen.orientation.lock) {
-                screen.orientation.lock("landscape").catch(e => console.log("lock error"));
-            }
-        }).catch(err => console.log("fullscreen error", err));
-    } else {
-        rotateScreen();
-    }
-}
-
-/* play stream using HLS.js or native */
-function playStream(url) {
-    if (!url) {
-        console.error("Invalid stream URL");
-        return;
-    }
-    currentVideoUrl = url;
-    // Reset previous HLS
-    if (hls) {
-        hls.destroy();
-        hls = null;
-    }
-    videoElement.pause();
-    videoElement.src = "";
     
     // Show player
-    playerOverlay.style.display = "flex";
+    playerContainer.style.display = "flex";
+    video.pause();
+    video.src = "";
     
-    // Detect HLS support
+    // Reset UI
+    progressFill.style.width = "0%";
+    updatePlayPauseIcon(false);
+    timeDisplay.innerText = "0:00 / 0:00";
+    
+    // Load stream
     if (Hls.isSupported()) {
-        hls = new Hls({
-            debug: false,
-            enableWorker: true,
-            lowLatencyMode: true,
-            backBufferLength: 60
-        });
+        hls = new Hls({ debug: false, enableWorker: true, lowLatencyMode: true, backBufferLength: 60 });
         hls.loadSource(url);
-        hls.attachMedia(videoElement);
+        hls.attachMedia(video);
         hls.on(Hls.Events.MANIFEST_PARSED, () => {
-            videoElement.play().catch(e => console.warn("Autoplay blocked:", e));
+            video.play().then(() => {
+                isPlaying = true;
+                updatePlayPauseIcon(true);
+            }).catch(e => console.log("autoplay blocked", e));
         });
         hls.on(Hls.Events.ERROR, (event, data) => {
-            console.error("HLS Error:", data);
             if (data.fatal) {
-                switch (data.type) {
-                    case Hls.ErrorTypes.NETWORK_ERROR:
-                        hls.startLoad();
-                        break;
-                    case Hls.ErrorTypes.MEDIA_ERROR:
-                        hls.recoverMediaError();
-                        break;
-                    default:
-                        closePlayer();
-                        showInlineError("Stream error: " + (data.details || "unknown"));
-                        break;
-                }
+                if (data.type === Hls.ErrorTypes.NETWORK_ERROR) hls.startLoad();
+                else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) hls.recoverMediaError();
+                else closeVideoPlayer();
             }
         });
-    } else if (videoElement.canPlayType("application/vnd.apple.mpegurl")) {
-        // Native HLS for Safari
-        videoElement.src = url;
-        videoElement.play().catch(e => console.log("play error", e));
+    } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
+        video.src = url;
+        video.play().then(() => {
+            isPlaying = true;
+            updatePlayPauseIcon(true);
+        }).catch(e => console.log(e));
     } else {
-        closePlayer();
-        showInlineError("HLS not supported in this browser.");
+        closeVideoPlayer();
+        alert("HLS not supported");
+    }
+    
+    // Event listeners for video
+    video.ontimeupdate = updateProgress;
+    video.onloadedmetadata = () => {
+        timeDisplay.innerText = formatTime(0) + " / " + formatTime(video.duration);
+    };
+    video.onended = () => {
+        updatePlayPauseIcon(false);
+        isPlaying = false;
+    };
+}
+
+function updateProgress() {
+    if (video.duration) {
+        const percent = (video.currentTime / video.duration) * 100;
+        progressFill.style.width = percent + "%";
+        timeDisplay.innerText = formatTime(video.currentTime) + " / " + formatTime(video.duration);
     }
 }
 
-function showInlineError(msg) {
-    const grid = document.getElementById("grid");
-    const errDiv = document.createElement("div");
-    errDiv.className = "error";
-    errDiv.innerText = "⚠️ " + msg;
-    grid.prepend(errDiv);
-    setTimeout(() => {
-        if(errDiv.parentNode) errDiv.remove();
-    }, 4000);
+function formatTime(seconds) {
+    if (isNaN(seconds)) return "0:00";
+    const hrs = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    const secs = Math.floor(seconds % 60);
+    if (hrs > 0) return `${hrs}:${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
+    return `${mins}:${secs.toString().padStart(2,'0')}`;
 }
 
-/* auto load Fifa2026 first on window load */
-window.onload = () => {
-    const firstTab = document.querySelector(".tab");
-    if (firstTab && playlists.length) {
-        loadCategory(playlists[0].url, firstTab);
+function updatePlayPauseIcon(playing) {
+    if (playing) playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+    else playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+}
+
+// Toggle play/pause
+playPauseBtn.onclick = () => {
+    if (video.paused) {
+        video.play();
+        isPlaying = true;
+        updatePlayPauseIcon(true);
     } else {
-        document.getElementById("grid").innerHTML = `<div class="error">No playlists defined</div>`;
+        video.pause();
+        isPlaying = false;
+        updatePlayPauseIcon(false);
     }
-    
-    // Optional: handle orientation change to fix any transform glitch
-    window.addEventListener("orientationchange", () => {
-        const playerDiv = document.getElementById("player");
-        if (playerDiv.style.display === "flex") {
-            // if player open, reset any fallback transform to avoid double rotation
-            if (playerDiv.style.transform && playerDiv.style.transform !== "none") {
-                playerDiv.style.transform = "";
-                document.body.style.overflow = "";
-            }
-        }
-    });
-    
-    // Also handle fullscreen change event for better UX
-    document.addEventListener("fullscreenchange", () => {
-        if (!document.fullscreenElement) {
-            // if exited fullscreen, optionally remove orientation lock
-            if (screen.orientation && screen.orientation.unlock) {
-                screen.orientation.unlock();
-            }
-        }
-    });
 };
 
-// improved keyboard / back button: close on escape
+// Progress seek
+progressBar.onclick = (e) => {
+    const rect = progressBar.getBoundingClientRect();
+    const pos = (e.clientX - rect.left) / rect.width;
+    if (video.duration) {
+        video.currentTime = pos * video.duration;
+    }
+};
+
+// Volume
+let volumeMuted = false;
+let lastVolume = 0.8;
+video.volume = 0.8;
+volumeFill.style.width = "80%";
+
+volumeSlider.onclick = (e) => {
+    const rect = volumeSlider.getBoundingClientRect();
+    let vol = (e.clientX - rect.left) / rect.width;
+    vol = Math.min(1, Math.max(0, vol));
+    video.volume = vol;
+    volumeFill.style.width = (vol * 100) + "%";
+    if (vol === 0) volumeBtn.innerHTML = '<i class="fas fa-volume-mute"></i>';
+    else volumeBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+    volumeMuted = (vol === 0);
+};
+
+volumeBtn.onclick = () => {
+    if (video.volume > 0) {
+        lastVolume = video.volume;
+        video.volume = 0;
+        volumeFill.style.width = "0%";
+        volumeBtn.innerHTML = '<i class="fas fa-volume-mute"></i>';
+    } else {
+        video.volume = lastVolume;
+        volumeFill.style.width = (lastVolume * 100) + "%";
+        volumeBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+    }
+};
+
+// Fullscreen
+fullscreenBtn.onclick = async () => {
+    if (!document.fullscreenElement) {
+        await playerContainer.requestFullscreen();
+        fullscreenBtn.innerHTML = '<i class="fas fa-compress"></i>';
+    } else {
+        await document.exitFullscreen();
+        fullscreenBtn.innerHTML = '<i class="fas fa-expand"></i>';
+    }
+};
+
+// Speed
+speedSelector.onchange = () => {
+    video.playbackRate = parseFloat(speedSelector.value);
+};
+
+// Rotate + Fullscreen combo
+rotateFullscreenBtn.onclick = async () => {
+    try {
+        if (screen.orientation && screen.orientation.lock) {
+            const isLandscape = screen.orientation.type.includes("landscape");
+            if (!isLandscape) {
+                await screen.orientation.lock("landscape");
+                if (!document.fullscreenElement) await playerContainer.requestFullscreen();
+            } else {
+                await screen.orientation.lock("portrait");
+                if (document.fullscreenElement) await document.exitFullscreen();
+            }
+        } else {
+            if (!document.fullscreenElement) await playerContainer.requestFullscreen();
+            else await document.exitFullscreen();
+        }
+    } catch(e) {
+        if (!document.fullscreenElement) await playerContainer.requestFullscreen();
+    }
+};
+
+// Close player
+function closeVideoPlayer() {
+    playerContainer.style.display = "none";
+    if (hls) { hls.destroy(); hls = null; }
+    video.pause();
+    video.src = "";
+    if (document.fullscreenElement) document.exitFullscreen();
+    if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock();
+}
+closePlayerBtn.onclick = closeVideoPlayer;
+
+// Touch to show/hide controls on mobile
+let controlsTimeout;
+videoWrapper.addEventListener("touchstart", () => {
+    customControls.style.opacity = "1";
+    clearTimeout(controlsTimeout);
+    controlsTimeout = setTimeout(() => {
+        if (isPlaying) customControls.style.opacity = "0";
+    }, 3000);
+});
+videoWrapper.addEventListener("mousemove", () => {
+    customControls.style.opacity = "1";
+    clearTimeout(controlsTimeout);
+    controlsTimeout = setTimeout(() => {
+        if (isPlaying) customControls.style.opacity = "0";
+    }, 2500);
+});
+
+// Fullscreen change event
+document.addEventListener("fullscreenchange", () => {
+    if (document.fullscreenElement) fullscreenBtn.innerHTML = '<i class="fas fa-compress"></i>';
+    else fullscreenBtn.innerHTML = '<i class="fas fa-expand"></i>';
+});
+
+// Auto-load first playlist
+window.onload = () => {
+    const firstTab = document.querySelector(".tab");
+    if (firstTab && playlists.length) loadCategory(playlists[0].url, firstTab);
+};
+
+// Keyboard shortcuts
 document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && playerOverlay.style.display === "flex") {
-        closePlayer();
-    }
+    if (playerContainer.style.display !== "flex") return;
+    if (e.code === "Space") { playPauseBtn.click(); e.preventDefault(); }
+    if (e.code === "ArrowLeft") video.currentTime -= 10;
+    if (e.code === "ArrowRight") video.currentTime += 10;
+    if (e.code === "Escape") closeVideoPlayer();
 });
-
-// extra: if user clicks on background of player, not close but just to avoid accidental
-playerOverlay.addEventListener("click", (e) => {
-    if (e.target === playerOverlay) {
-        // optional: close only if click on backdrop? but it's better not to close accidentally: but many apps close
-        // we keep it as no auto close, but we can close if click on backdrop: set to subtle? i'll keep close only via X.
-        // but some users may expect click on empty area to close? I prefer only close button.
-        // do nothing
-    }
-});
-
-// ensure that if we use fallback rotation, we also allow resetting with rotate button again.
-// Add a more robust screen orientation lock: double-tap rotate btn will try to revert.
-// also added an extra style to maintain UI
 </script>
 </body>
 </html>
